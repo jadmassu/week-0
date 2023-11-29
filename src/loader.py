@@ -10,6 +10,7 @@ from datetime import datetime
 # from pick import pick
 from time import sleep
 import pandas as pd
+from matplotlib import pyplot as plt
 
 
 # Create wrapper classes for using slack_sdk in place of slacker
@@ -127,7 +128,8 @@ class SlackDataLoader:
         
         return dfall
 
-    def slack_parser(self, path_channel):
+
+    def slack_parser(self,path_channel):
         """ parse slack data to extract useful informations from the json file
             step of execution
             1. Import the required modules
@@ -138,26 +140,32 @@ class SlackDataLoader:
             6. reset the index and return dataframe
         """
 
-        # specify path to get json files
+    # specify path to get json files
         combined = []
+       
         for json_file in glob.glob(f"{path_channel}*.json"):
-            
-            with open(json_file, 'r', encoding="utf8") as slack_data:
+         
+            with open(json_file, 'r', encoding="utf8") as file:
+                slack_data = file.read()
                 combined.append(slack_data)
-        print(combined)
+        
         # loop through all json files and extract required informations
         dflist = []
         for slack_data in combined:
+            json_data = json.loads(slack_data)
 
-            msg_type, msg_content, sender_id, time_msg, msg_dist, time_thread_st, reply_users, \
-            reply_count, reply_users_count, tm_thread_end = [],[],[],[],[],[],[],[],[],[]
+            msg_type,user, msg_content, sender_id, time_msg, msg_dist, time_thread_st, reply_users, \
+            reply_count, reply_users_count, tm_thread_end = [],[],[],[],[],[],[],[],[],[],[]
 
-            for row in slack_data:
+            for row in json_data:
                 if 'bot_id' in row.keys():
                     continue
                 else:
                     msg_type.append(row['type'])
+                    user.append(row['user'])
+                    
                     msg_content.append(row['text'])
+                    
                     if 'user_profile' in row.keys(): sender_id.append(row['user_profile']['real_name'])
                     else: sender_id.append('Not provided')
                     time_msg.append(row['ts'])
@@ -178,28 +186,37 @@ class SlackDataLoader:
                         reply_count.append(0)
                         reply_users_count.append(0)
                         tm_thread_end.append(0)
-            data = zip(msg_type, msg_content, sender_id, time_msg, msg_dist, time_thread_st,
+            data = zip(msg_type, user,msg_content, sender_id, time_msg, msg_dist, time_thread_st,
             reply_count, reply_users_count, reply_users, tm_thread_end)
-            columns = ['msg_type', 'msg_content', 'sender_name', 'msg_sent_time', 'msg_dist_type',
+            columns = ['msg_type', 'user','msg_content', 'sender_name', 'msg_sent_time', 'msg_dist_type',
             'time_thread_start', 'reply_count', 'reply_users_count', 'reply_users', 'tm_thread_end']
 
             df = pd.DataFrame(data=data, columns=columns)
             df = df[df['sender_name'] != 'Not provided']
             dflist.append(df)
             
-        for item in dflist:
-            if isinstance(item, pd.DataFrame):
-                print("DataFrame found!")
-            else:
-                print("Not a DataFrame.")
+        # for item in dflist:
+        #     if isinstance(item, pd.DataFrame):
+        #         print("DataFrame found!")
+        #     else:
+        #         print("Not a DataFrame.")
             
-        print(dflist)
+        # print(dflist)
         dfall = pd.concat(dflist, ignore_index=True)
         dfall['channel'] = path_channel.split('/')[-1].split('.')[0]        
         dfall = dfall.reset_index(drop=True)
         
         return dfall
 
+    def draw_avg_reply_count(self, data, channel='Random'):#which user has the highest number of reply counts?
+        """who commands many reply?"""
+        df = pd.DataFrame(data)
+        df.groupby('sender_name')['reply_count'].mean().sort_values(ascending=False)[:20]\
+            .plot(kind='bar', figsize=(15,7.5));
+        plt.title(f'Average Number of reply count per Sender in #{channel}', size=20, fontweight='bold')
+        plt.xlabel("Sender Name", size=18); plt.ylabel("Frequency", size=18);
+        plt.xticks(size=14); plt.yticks(size=14);
+        plt.show()
 
     def parse_slack_reaction(self, path, channel):
             """get reactions"""
@@ -229,6 +246,20 @@ class SlackDataLoader:
             df_reaction['channel'] = channel
             return df_reaction
     # 
+    def visualize_reply_counts(self, data, channel='Random'):
+        """Visualize reply counts per user per channel"""
+        df = pd.DataFrame(data)
+        grouped = df.groupby(['user', 'channel'])['reply_count'].sum().unstack()
+
+        grouped.plot(kind='bar', figsize=(15, 7.5))
+        plt.title(f'Reply Counts per User in #{channel}', size=20, fontweight='bold')
+        plt.xlabel("User", size=18)
+        plt.ylabel("Reply Count", size=18)
+        plt.xticks(size=14)
+        plt.yticks(size=14)
+        plt.legend(title="Channel", title_fontsize=14, fontsize=12)
+
+        plt.show()
     def get_user_map(self):
         '''
         write a function to get a map between user id and user name
