@@ -26,7 +26,7 @@ jobs:
       - name: Check Flake8
         run: |
           flake8 src/ >> flake8_output.md
-          echo '### Hello world! ' >> $GITHUB_STEP_SUMMARY
+
         continue-on-error: true
 
       - name: Display Flake8 output using step summary
