@@ -272,6 +272,38 @@ class SlackDataLoader:
         return userNamesById, userIdsByName        
 
 
+    def draw_user_reaction(self,data, channel='General'):
+        data.groupby('sender_name')[['reply_count', 'reply_users_count']].sum()\
+            .sort_values(by='reply_count',ascending=False)[:10].plot(kind='bar', figsize=(15, 7.5))
+        plt.title(f'User with the most reaction in #{channel}', size=25);
+        plt.xlabel("Sender Name", size=18); plt.ylabel("Frequency", size=18);
+        plt.xticks(size=14); plt.yticks(size=14);
+        plt.show()
+
+    def get_top_20_user(self, data, channel='Random'):
+        """get user with the highest number of message sent to any channel"""
+
+        data['sender_name'].value_counts()[:10].plot.bar(figsize=(15, 7.5))
+        plt.title(f'Top 20 Message Senders in #{channel} channels', size=15, fontweight='bold')
+        plt.xlabel("Sender Name", size=18); plt.ylabel("Frequency", size=14);
+        plt.xticks(size=12); plt.yticks(size=12);
+        plt.show()
+
+        data['sender_name'].value_counts()[-10:].plot.bar(figsize=(15, 7.5))
+        plt.title(f'Bottom 10 Message Senders in #{channel} channels', size=15, fontweight='bold')
+        plt.xlabel("Sender Name", size=18); plt.ylabel("Frequency", size=14);
+        plt.xticks(size=12); plt.yticks(size=12);
+        plt.show()
+        
+    def draw_avg_reply_users_count(self,data, channel='Random'):
+        """who commands many user reply?"""
+
+        data.groupby('sender_name')['reply_users_count'].mean().sort_values(ascending=False)[:10].plot(kind='bar',
+        figsize=(15,7.5));
+        plt.title(f'Average Number of reply user count per Sender in #{channel}', size=20, fontweight='bold')
+        plt.xlabel("Sender Name", size=18); plt.ylabel("Frequency", size=18);
+        plt.xticks(size=14); plt.yticks(size=14);
+        plt.show()
 
 
 if __name__ == "__main__":
