@@ -1,6 +1,11 @@
 import mysql.connector
 import json
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 def convert_data_to_list(data):
     if isinstance(data, str):
@@ -14,10 +19,10 @@ def convert_data_to_list(data):
 def get_database_connection():
 
     db = mysql.connector.connect(
-        host="your_host",
-        user="your_username",
-        password="your_password",
-        database="your_database"
+        host = os.getenv('DB_HOST')
+        user = os.getenv('DB_USER')
+        password = os.getenv('DB_PASSWORD')
+        database = os.getenv('DB_DATABASE')
     )
     return db
 
