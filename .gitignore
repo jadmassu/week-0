@@ -162,4 +162,4 @@ venv.bak/
 # Slack data source
 /anonymized
 
-.config.env
+config.env
