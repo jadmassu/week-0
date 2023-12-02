@@ -1,12 +1,12 @@
 import streamlit as st
 import os, sys
 # Add parent directory to path to import modules from src
-rpath = os.path.abspath('../src')
+rpath = os.path.abspath('..week0/src')
 print(rpath)
 if rpath not in sys.path:
     sys.path.insert(0, rpath)
 
-# print(src.loader)
+print(sys.path)
 from loader import SlackDataLoader
 import utils as utils
 
