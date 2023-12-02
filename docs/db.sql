@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `SlackInformation` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `msg_type` VARCHAR(200) NOT NULL,
     `user` VARCHAR(200) NOT NULL,
-    `msg_content` VARCHAR(255) NOT NULL,
+    `msg_content` VARCHAR(1000) NOT NULL,
     `sender_name` VARCHAR(200) NOT NULL,
     `msg_sent_time` VARCHAR(200) NOT NULL,
     `msg_dist_type` VARCHAR(200) NOT NULL,
