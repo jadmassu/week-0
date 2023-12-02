@@ -161,5 +161,4 @@ venv.bak/
 
 # Slack data source
 
-
-# config.env
+ config.env
