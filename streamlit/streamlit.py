@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import os, sys
 # Add parent directory to path to import modules from src
 rpath = os.path.realpath('src')
@@ -30,7 +31,9 @@ def main():
     elif options == "Top Users":
         get_top_users(data)
     elif options == "Top Messages":
-        top_message_count( )     
+        top_message_count()
+    elif options == "Sender Counts":
+        sender_counts(data)    
     # button_clicked = st.sidebar.button("Click Me")
     # button_clicked2 = st.sidebar.button("Click Me2")
     
@@ -39,7 +42,7 @@ def main():
     #     reply_counts(data)
 
 def get_sidebar():
-    selected_option = st.sidebar.selectbox("Select an option", ["All Data", "Top Users", "Top Messages"])
+    selected_option = st.sidebar.selectbox("Select an option", ["All Data", "Top Users", "Top Messages","Sender Counts"])
     return selected_option
 
 def get_data():
@@ -61,6 +64,14 @@ def top_message_count():
     sorted_df = reactions.sort_values('reaction_count', ascending=False)
     top_10_reactions = sorted_df.head(20)
     st.dataframe(top_10_reactions[['reaction_name', 'reaction_count']])
+    
+def sender_counts(data):
+    sender_counts = data['sender_name'].value_counts()[:10]
+    chart_data = pd.DataFrame(sender_counts)
+    chart_data.columns = ['Count']
+
+    # Display the bar chart using Streamlit
+    st.bar_chart(chart_data, width=15, height=7.5)
 
 def reply_counts(data):
    return  st.dataframe(data)
