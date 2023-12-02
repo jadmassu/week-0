@@ -1,7 +1,7 @@
 import streamlit as st
 import os, sys
 # Add parent directory to path to import modules from src
-rpath = os.path.abspath('/home/user/Documents/10/Assignment/week-0/src')
+rpath = os.path.abspath('../src')
 print(rpath)
 if rpath not in sys.path:
     sys.path.insert(0, rpath)
