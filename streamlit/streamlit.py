@@ -12,7 +12,7 @@ import utils as utils
 
 
 
-read_file = SlackDataLoader("../anonymized")
+read_file = SlackDataLoader("./anonymized")
 
 
 def main():
@@ -40,7 +40,7 @@ def get_sidebar():
     return selected_option
 
 def get_data():
-    data = read_file.slack_parser("../anonymized/all-week8/")
+    data = read_file.slack_parser("./anonymized/all-week8/")
     return data
 
 
